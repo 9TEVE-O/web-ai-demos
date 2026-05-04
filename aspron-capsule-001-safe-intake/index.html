@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ASPRON Capsule 001 — Safe Intake. A no-backend, no-dependency proof for controlled AI intake: detect, block, redact, approve, summarise, audit, dissolve." />
+  <title>ASPRON Capsule 001 — Safe Intake</title>
+  <style>
+    :root {
+      --bg: #070808;
+      --panel: #101313;
+      --panel-2: #151919;
+      --text: #f2f7f4;
+      --muted: #9fb0a8;
+      --line: rgba(255,255,255,0.12);
+      --good: #8ff0b3;
+      --warn: #ffd166;
+      --bad: #ff6b6b;
+      --cyan: #9ffcff;
+      --shadow: 0 24px 80px rgba(0,0,0,0.45);
+      --radius: 22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+
+    body {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(143, 240, 179, 0.10), transparent 28rem),
+        radial-gradient(circle at 80% 4%, rgba(159, 252, 255, 0.08), transparent 24rem),
+        linear-gradient(180deg, #070808 0%, #0b0d0d 100%);
+    }
+
+    .page { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 72px; }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .hero, .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero { padding: 28px; position: relative; }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 24px 24px auto;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 24px var(--good);
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .eyebrow { color: var(--good); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.74rem; }
+    h1 { margin: 12px 0 8px; font-size: clamp(2.4rem, 8vw, 6.2rem); line-height: 0.86; letter-spacing: -0.08em; }
+    .tagline { margin: 0; font-size: clamp(1.05rem, 2.3vw, 1.65rem); line-height: 1.35; color: var(--text); max-width: 780px; }
+    .subline { margin: 18px 0 0; color: var(--muted); line-height: 1.55; max-width: 780px; }
+
+    .doctrine { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .doctrine h2 { margin: 0; font-size: 1.15rem; }
+    .doctrine p { margin: 12px 0 0; color: var(--muted); line-height: 1.55; }
+    .doctrine strong { color: var(--text); }
+
+    .stack {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .stack .card { padding: 18px; }
+    .stack h3 { margin: 0 0 10px; font-size: 1rem; }
+    .stack p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 0.95rem; }
+
+    .demo {
+      display: grid;
+      grid-template-columns: 1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .workbench { padding: 18px; }
+    .workbench h2, .receipt h2 { margin: 0 0 12px; font-size: 1.15rem; }
+
+    label { display: block; color: var(--muted); font-size: 0.86rem; margin-bottom: 8px; }
+    textarea {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      background: #060707;
+      color: var(--text);
+      border-radius: 18px;
+      padding: 14px;
+      font: inherit;
+      line-height: 1.45;
+      outline: none;
+    }
+
+    textarea:focus { border-color: rgba(143, 240, 179, 0.55); box-shadow: 0 0 0 4px rgba(143, 240, 179, 0.10); }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    button {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: #18201c;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 12px 13px;
+      font: inherit;
+      font-weight: 760;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+      min-height: 48px;
+    }
+
+    button:hover:not(:disabled) { transform: translateY(-1px); border-color: rgba(143, 240, 179, 0.60); }
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
+    button.primary { background: linear-gradient(180deg, rgba(143, 240, 179, 0.22), rgba(143, 240, 179, 0.08)); }
+    button.danger { background: linear-gradient(180deg, rgba(255, 107, 107, 0.18), rgba(255, 107, 107, 0.06)); }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin: 14px 0;
+    }
+
+    .step {
+      min-height: 56px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .step.done { color: #05100a; background: var(--good); border-color: var(--good); font-weight: 900; }
+    .step.blocked { color: #170606; background: var(--bad); border-color: var(--bad); font-weight: 900; }
+
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .output {
+      border: 1px solid var(--line);
+      background: #080a0a;
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 130px;
+      color: var(--muted);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+    .output strong { color: var(--text); }
+
+    .receipt { padding: 18px; position: sticky; top: 14px; }
+    .receipt-box {
+      border: 1px solid var(--line);
+      background: #080a0a;
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 380px;
+      white-space: pre-wrap;
+      color: var(--muted);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .banner {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid rgba(143, 240, 179, 0.28);
+      background: rgba(143, 240, 179, 0.08);
+      color: var(--good);
+      border-radius: 18px;
+      padding: 14px;
+      font-weight: 800;
+    }
+
+    .rabbit {
+      display: none;
+      margin-top: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: var(--good);
+      text-shadow: 0 0 18px rgba(143,240,179,0.35);
+      white-space: pre;
+      font-size: 1rem;
+      line-height: 1.05;
+    }
+
+    .dissolved .workbench textarea,
+    .dissolved .output,
+    .dissolved .status {
+      filter: blur(5px);
+      opacity: 0.18;
+      pointer-events: none;
+      transition: all 0.6s ease;
+    }
+
+    .dissolved .banner, .dissolved .rabbit { display: block; }
+
+    footer { margin-top: 24px; color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
+    footer strong { color: var(--text); }
+
+    @media (max-width: 880px) {
+      header, .demo, .stack, .panels { grid-template-columns: 1fr; }
+      .status { grid-template-columns: repeat(2, 1fr); }
+      .receipt { position: static; }
+      .page { width: min(100% - 18px, 680px); padding-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="app">
+    <header>
+      <section class="hero" aria-labelledby="title">
+        <div class="eyebrow">ASPRON / Capsule 001</div>
+        <h1 id="title">Safe Intake</h1>
+        <p class="tagline">The interface dissolves. The effect remains. The evidence survives.</p>
+        <p class="subline">A phone-first, no-backend proof for controlled AI intake. The capsule detects risk, blocks raw sensitive input, creates a reviewed redacted copy, produces an AI-visible summary, exports an evidence receipt, then dissolves its own working interface.</p>
+      </section>
+
+      <aside class="doctrine card">
+        <div>
+          <h2>Doctrine</h2>
+          <p><strong>Destroy the capability. Preserve the accountability.</strong></p>
+          <p>ASPRON is not just an app. It is a controlled lifecycle for temporary AI capability: activate, act, prove, revoke.</p>
+        </div>
+      </aside>
+    </header>
+
+    <section class="stack" aria-label="ASPRON architecture layers">
+      <article class="card">
+        <h3>Layer 1 — Capsules</h3>
+        <p>Single-purpose workflows for high-stakes jobs. Each capsule performs one verb and then revokes its own working surface.</p>
+      </article>
+      <article class="card">
+        <h3>Layer 2 — Pattern</h3>
+        <p>detect → block → redact → approve → summarise → audit → dissolve. The pattern can become SDK infrastructure.</p>
+      </article>
+      <article class="card">
+        <h3>Layer 3 — Governance</h3>
+        <p>ASPRON shows controlled intake. LAB audits reveal what enters, what is blocked, who approved it, and what evidence survives.</p>
+      </article>
+    </section>
+
+    <section class="demo" aria-label="ASPRON Safe Intake demo">
+      <section class="workbench card">
+        <h2>Capsule workflow</h2>
+        <label for="rawText">Paste sample intake text. Use fake data only.</label>
+        <textarea id="rawText">Artist: Jamie Example
+Email: jamie@example.com
+Phone: 0400 123 456
+TFN: 123 456 789
+Contract note: Needs review before AI summarisation.</textarea>
+
+        <div class="status" id="steps" aria-live="polite"></div>
+
+        <div class="controls">
+          <button class="primary" id="detectBtn">1. Detect risk</button>
+          <button id="redactBtn">2. Generate redaction</button>
+          <button id="approveBtn">3. Approve</button>
+          <button id="summaryBtn">4. Generate summary</button>
+          <button id="exportBtn">5. Export receipt</button>
+          <button class="danger" id="dissolveBtn">6. Dissolve</button>
+        </div>
+
+        <div class="panels">
+          <div>
+            <label>Risk detection</label>
+            <div class="output" id="riskOut">Waiting for intake text.</div>
+          </div>
+          <div>
+            <label>AI-visible redacted copy</label>
+            <div class="output" id="redactedOut">Blocked until risk detection completes.</div>
+          </div>
+        </div>
+
+        <div class="panels">
+          <div>
+            <label>Summary</label>
+            <div class="output" id="summaryOut">Blocked until approval.</div>
+          </div>
+          <div>
+            <label>Audit log</label>
+            <div class="output" id="auditOut">No events yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="receipt card">
+        <h2>Evidence receipt</h2>
+        <div class="receipt-box" id="receiptOut">Receipt not exported yet.</div>
+        <div class="banner">Capsule dissolved. Working interface revoked. Evidence preserved.</div>
+        <div class="rabbit" aria-label="ASPRON rabbit mascot">(\(\
+( -.-)
+o_(")(") cool.</div>
+      </aside>
+    </section>
+
+    <footer>
+      <p><strong>Flywheel:</strong> Capsules prove the pattern. The pattern opens the audit. The audit defines the next capsule. It is not a portfolio. It is a position.</p>
+      <p>Built by 9TEVE-O. Directed by intent. Constrained by evidence. Phone-first. Ship, verify, improve.</p>
+    </footer>
+  </main>
+
+  <script>
+    const state = {
+      riskDetected: false,
+      blocked: false,
+      redactedText: "",
+      approved: false,
+      summary: "",
+      exported: false,
+      dissolved: false,
+      events: []
+    };
+
+    const els = {
+      app: document.getElementById("app"),
+      rawText: document.getElementById("rawText"),
+      detectBtn: document.getElementById("detectBtn"),
+      redactBtn: document.getElementById("redactBtn"),
+      approveBtn: document.getElementById("approveBtn"),
+      summaryBtn: document.getElementById("summaryBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      dissolveBtn: document.getElementById("dissolveBtn"),
+      steps: document.getElementById("steps"),
+      riskOut: document.getElementById("riskOut"),
+      redactedOut: document.getElementById("redactedOut"),
+      summaryOut: document.getElementById("summaryOut"),
+      auditOut: document.getElementById("auditOut"),
+      receiptOut: document.getElementById("receiptOut")
+    };
+
+    const riskRules = [
+      { label: "email", pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, replacement: "[EMAIL_001]" },
+      { label: "phone", pattern: /(?:\+?61\s?|0)[2-478](?:[\s-]?\d){8}/g, replacement: "[PHONE_001]" },
+      { label: "tax file number pattern", pattern: /\b\d{3}\s?\d{3}\s?\d{3}\b/g, replacement: "[SENSITIVE_NUMBER_001]" },
+      { label: "person/name marker", pattern: /\b(Artist|Client|Resident|Customer|Patient):\s*[^\n]+/gi, replacement: "$1: [PERSON_001]" }
+    ];
+
+    function now() {
+      return new Date().toISOString();
+    }
+
+    function addEvent(type, detail) {
+      state.events.push({ time: now(), type, detail });
+      render();
+    }
+
+    function getRawText() {
+      return els.rawText.value.trim();
+    }
+
+    function detectRisks(text) {
+      return riskRules
+        .map(rule => ({ label: rule.label, count: (text.match(rule.pattern) || []).length }))
+        .filter(item => item.count > 0);
+    }
+
+    function redact(text) {
+      let output = text;
+      riskRules.forEach(rule => {
+        output = output.replace(rule.pattern, rule.replacement);
+      });
+      return output;
+    }
+
+    function makeSummary(redacted) {
+      const compact = redacted
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .slice(0, 4)
+        .join(" ");
+
+      return "Approved AI-visible summary:\n" +
+        "The intake contains a contract/review note and has had direct identifiers replaced with typed placeholders before summarisation. Review remains required before operational use.\n\n" +
+        "Source basis: " + compact;
+    }
+
+    function makeReceipt() {
+      return JSON.stringify({
+        capsule: "ASPRON Capsule 001 — Safe Intake",
+        doctrine: "The interface dissolves. The effect remains. The evidence survives.",
+        lifecycle: ["detect", "block", "redact", "approve", "summarise", "audit", "dissolve"],
+        raw_input_retained_in_receipt: false,
+        approved_ai_visible_input: state.redactedText,
+        summary: state.summary,
+        exported_at: now(),
+        events: state.events
+      }, null, 2);
+    }
+
+    function renderSteps() {
+      const items = [
+        ["detect", state.riskDetected],
+        ["block", state.blocked],
+        ["redact", Boolean(state.redactedText)],
+        ["approve", state.approved],
+        ["summarise", Boolean(state.summary)],
+        ["audit", state.events.length > 0],
+        ["dissolve", state.dissolved]
+      ];
+      els.steps.innerHTML = items.map(([name, done]) => `<div class="step ${done ? "done" : ""}">${name}</div>`).join("");
+    }
+
+    function render() {
+      const hasRaw = Boolean(getRawText());
+
+      els.detectBtn.disabled = state.dissolved || !hasRaw;
+      els.redactBtn.disabled = state.dissolved || !state.riskDetected;
+      els.approveBtn.disabled = state.dissolved || !state.redactedText;
+      els.summaryBtn.disabled = state.dissolved || !state.approved;
+      els.exportBtn.disabled = state.dissolved || !state.summary;
+      els.dissolveBtn.disabled = state.dissolved || !(state.exported || state.summary);
+
+      renderSteps();
+
+      els.auditOut.textContent = state.events.length
+        ? state.events.map(e => `${e.time} — ${e.type}: ${e.detail}`).join("\n")
+        : "No events yet.";
+
+      els.app.classList.toggle("dissolved", state.dissolved);
+    }
+
+    els.rawText.addEventListener("input", () => {
+      if (state.dissolved) return;
+      state.riskDetected = false;
+      state.blocked = false;
+      state.redactedText = "";
+      state.approved = false;
+      state.summary = "";
+      state.exported = false;
+      state.events = [];
+      els.riskOut.textContent = "Waiting for risk detection.";
+      els.redactedOut.textContent = "Blocked until risk detection completes.";
+      els.summaryOut.textContent = "Blocked until approval.";
+      els.receiptOut.textContent = "Receipt not exported yet.";
+      render();
+    });
+
+    els.detectBtn.addEventListener("click", () => {
+      const raw = getRawText();
+      const risks = detectRisks(raw);
+      state.riskDetected = true;
+      state.blocked = risks.length > 0;
+      els.riskOut.textContent = risks.length
+        ? "Raw intake blocked from AI use. Detected: " + risks.map(r => `${r.label} x${r.count}`).join(", ")
+        : "No configured high-risk patterns detected. Review still recommended.";
+      addEvent("RISK_DETECTED", risks.length ? `${risks.length} risk type(s) found; raw input blocked.` : "No configured risk patterns found.");
+    });
+
+    els.redactBtn.addEventListener("click", () => {
+      state.redactedText = redact(getRawText());
+      els.redactedOut.textContent = state.redactedText;
+      addEvent("REDACTION_GENERATED", "Typed placeholders created. Only redacted text may move forward.");
+    });
+
+    els.approveBtn.addEventListener("click", () => {
+      state.approved = true;
+      addEvent("HUMAN_APPROVED", "Reviewer approved redacted copy for AI-visible use.");
+    });
+
+    els.summaryBtn.addEventListener("click", () => {
+      state.summary = makeSummary(state.redactedText);
+      els.summaryOut.textContent = state.summary;
+      addEvent("SUMMARY_GENERATED", "Summary generated from approved redacted copy only.");
+    });
+
+    els.exportBtn.addEventListener("click", () => {
+      state.exported = true;
+      const receipt = makeReceipt();
+      els.receiptOut.textContent = receipt;
+      addEvent("RECEIPT_EXPORTED", "Evidence receipt exported without raw input.");
+      els.receiptOut.textContent = makeReceipt();
+    });
+
+    els.dissolveBtn.addEventListener("click", () => {
+      state.dissolved = true;
+      addEvent("CAPSULE_DISSOLVED", "Working controls disabled. Evidence remains visible.");
+      Array.from(document.querySelectorAll("button")).forEach(button => button.disabled = true);
+    });
+
+    render();
+  </script>
+</body>
+</html>
