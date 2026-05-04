@@ -7,6 +7,7 @@ This repository contains demos related to client-side (in-browser) AI.
 Some of these demos use [Chrome built-in AI](https://developer.chrome.com/docs/ai/built-in). 
 Others showcase generic client-side AI using Transformers.js or Google's Gemma model through MediaPipe.
 
+- `aspron-capsule-001-safe-intake`: ASPRON Capsule 001 — Safe Intake. A no-backend, no-dependency proof for controlled AI intake: detect, block, redact, approve, summarise, audit, dissolve.
 - `weather-ai`: Uses Chrome's built-in Prompt API to generate a human-readable description of the weather from structured weather data provided by the OpenWeatherMap API.
 - `prompt-api-playground`: Showcases Chrome's built-in experimental Prompt API.
 - `summarization-api-playground`: Showcases Chrome's built-in experimental Summarization API.
